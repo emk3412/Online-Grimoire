@@ -5,6 +5,7 @@ var tokens_ref;
 var loading = false;
 var CURRENT_SCRIPT;
 var night_order_ref;
+let tokenBeingMoved = null;
 class NightCounter
 {
   constructor()
@@ -1437,6 +1438,8 @@ function dragInit()
   const dragSpots = document.getElementsByClassName("drag");
   for (var i = 0; i < dragSpots.length; i++)
   {
+
+    
     var container = dragSpots[i];
 
     container.addEventListener("touchstart", dragStart, false);
@@ -1446,10 +1449,28 @@ function dragInit()
     container.addEventListener("mousedown", dragStart, false);
     container.addEventListener("mouseup", dragEnd, false);
     container.addEventListener("mousemove", drag, false);
+
+    
+    
+
   }
+
+  document.addEventListener("mousemove", drag, false);
+  document.addEventListener("touchmove", drag, false);
+
+  
 }
+
+let el = false
+let mousedown = false;
+
 function dragStart(e)
 {
+
+  tokenBeingMoved = e.target;
+
+
+
   if (document.getElementById("move_toggle").style.backgroundColor != "green" && isRoleToken(e.target)) { return }
   const token = getActualDragged(e.target);
   var pos = getComputedStyle(token)
@@ -1516,29 +1537,36 @@ function dragEnd(e)
   }
   active = false;
   if (!loading) { save_game_state(); }
+
+  var container = dragSpots[i];
+
 }
 function drag(e)
 {
+
   if (active)
   {
 
     e.preventDefault();
-    let moved = e.target;
+
+    let moved = tokenBeingMoved;
 
     while (moved.localName != "html" && moved.localName != "div") {
       moved = moved.parentElement;
     }
     //if (!moved.classList.contains("role_token")) return;
 
+   
     if (e.type === "touchmove")
-    {
-      currentX = e.touches[0].clientX - xOffset;
-      currentY = e.touches[0].clientY - yOffset;
-    } else
-    {
-      currentX = e.clientX - xOffset;
-      currentY = e.clientY - yOffset;
-    }
+      {
+        currentX = e.touches[0].clientX - xOffset;
+        currentY = e.touches[0].clientY - yOffset;
+      } else
+      {
+        currentX = e.clientX - xOffset;
+        currentY = e.clientY - yOffset;
+      }
+   
 
     setTranslate(currentX, currentY, moved);
   }
